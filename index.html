@@ -39,6 +39,30 @@
       font-size: 25px;
     }
 
+    .teamboard-start {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: white;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .teamboard-start img {
+      max-width: 80vw;
+      max-height: 65vh;
+      object-fit: contain;
+    }
+
+    .teamboard-text {
+      margin-top: 20px;
+      font-size: 32px;
+      font-weight: bold;
+    }
+
     @media (max-width: 600px) {
       .date {
         font-size: 20px;
@@ -47,14 +71,24 @@
       .time {
         font-size: 44px;
       }
+
+      .teamboard-text {
+        font-size: 24px;
+      }
     }
   </style>
 </head>
 
 <body>
-  <div class="widget">
+
+  <div class="widget" id="widget">
     <div class="time" id="time">--:--:--</div>
     <div class="date" id="date">Datum wird geladen …</div>
+  </div>
+
+  <div class="teamboard-start" id="teamboardStart">
+    <img src="teamboard.gif" alt="Teamboard startet">
+    <div class="teamboard-text">Teamboard startet jetzt!</div>
   </div>
 
   <script>
@@ -97,10 +131,20 @@
       document.getElementById("time").textContent = time;
       document.getElementById("date").textContent =
         `${date} (KW ${calendarWeek})`;
+
+      const teamboardLaeuft =
+        now.getHours() === 13 && now.getMinutes() < 5;
+
+      document.getElementById("widget").style.display =
+        teamboardLaeuft ? "none" : "block";
+
+      document.getElementById("teamboardStart").style.display =
+        teamboardLaeuft ? "flex" : "none";
     }
 
     updateWidget();
     setInterval(updateWidget, 1000);
   </script>
+
 </body>
 </html>
