@@ -4,12 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Datum und Uhrzeit</title>
-
   <style>
     * {
       box-sizing: border-box;
     }
-
     body {
       margin: 0;
       min-height: 100vh;
@@ -18,7 +16,6 @@
       color: #001b70;
       overflow: hidden;
     }
-
     .widget {
       position: fixed;
       left: 50%;
@@ -27,34 +24,66 @@
       width: 100%;
       text-align: center;
     }
-
     .time {
       font-size: 50px;
       font-weight: bold;
       line-height: 1;
       margin-bottom: 14px;
     }
-
     .date {
       font-size: 25px;
     }
-
     @media (max-width: 600px) {
       .date {
         font-size: 20px;
       }
-
       .time {
         font-size: 44px;
       }
     }
+
+    /* Erinnerungs-Overlay */
+    .reminder {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: white;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+    }
+    .reminder.active {
+      display: flex;
+    }
+    .reminder .bell {
+      font-size: 90px;
+      line-height: 1;
+      margin-bottom: 20px;
+      animation: ring 1s infinite;
+    }
+    .reminder .text {
+      font-size: 32px;
+      font-weight: bold;
+    }
+    @keyframes ring {
+      0%, 100% { transform: rotate(0deg); }
+      20% { transform: rotate(-15deg); }
+      40% { transform: rotate(15deg); }
+      60% { transform: rotate(-10deg); }
+      80% { transform: rotate(10deg); }
+    }
   </style>
 </head>
-
 <body>
-  <div class="widget">
+  <div class="widget" id="widget">
     <div class="time" id="time">--:--:--</div>
     <div class="date" id="date">Datum wird geladen …</div>
+  </div>
+
+  <div class="reminder" id="reminder">
+    <div class="bell">🔔</div>
+    <div class="text">Bitte Observer wählen.</div>
   </div>
 
   <script>
@@ -62,21 +91,41 @@
       const tempDate = new Date(
         Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
       );
-
       const dayNumber = tempDate.getUTCDay() || 7;
       tempDate.setUTCDate(tempDate.getUTCDate() + 4 - dayNumber);
-
       const yearStart = new Date(
         Date.UTC(tempDate.getUTCFullYear(), 0, 1)
       );
-
       return Math.ceil(
         (((tempDate - yearStart) / 86400000) + 1) / 7
       );
     }
 
+    // Erinnerung: Startzeit und Dauer
+    const REMINDER_HOUR = 8;
+    const REMINDER_MINUTE = 15;
+    const REMINDER_DURATION_MS = 2 * 60 * 1000; // 2 Minuten
+
+    function isReminderActive(now) {
+      // Zeitpunkt, an dem die Erinnerung heute startet
+      const start = new Date(now);
+      start.setHours(REMINDER_HOUR, REMINDER_MINUTE, 0, 0);
+      const end = new Date(start.getTime() + REMINDER_DURATION_MS);
+      return now >= start && now < end;
+    }
+
     function updateWidget() {
       const now = new Date();
+      const widgetEl = document.getElementById("widget");
+      const reminderEl = document.getElementById("reminder");
+
+      if (isReminderActive(now)) {
+        widgetEl.style.display = "none";
+        reminderEl.classList.add("active");
+      } else {
+        widgetEl.style.display = "";
+        reminderEl.classList.remove("active");
+      }
 
       const time = now.toLocaleTimeString("de-DE", {
         hour: "2-digit",
@@ -84,21 +133,17 @@
         second: "2-digit",
         hour12: false
       });
-
       const date = now.toLocaleDateString("de-DE", {
         weekday: "long",
         day: "2-digit",
         month: "long",
         year: "numeric"
       });
-
       const calendarWeek = getCalendarWeek(now);
-
       document.getElementById("time").textContent = time;
       document.getElementById("date").textContent =
         `${date} (KW ${calendarWeek})`;
     }
-
     updateWidget();
     setInterval(updateWidget, 1000);
   </script>
