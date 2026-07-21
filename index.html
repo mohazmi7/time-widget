@@ -57,13 +57,13 @@
       display: flex;
     }
     .reminder .bell {
-      font-size: 55px;
+      font-size: 50px;
       line-height: 1;
-      margin-bottom: 14px;
+      margin-bottom: 20px;
       animation: ring 1s infinite;
     }
     .reminder .text {
-      font-size: 22px;
+      font-size: 28px;
       font-weight: bold;
     }
     @keyframes ring {
@@ -103,7 +103,7 @@
 
     // Erinnerung: Startzeit und Dauer
     const REMINDER_HOUR = 8;
-    const REMINDER_MINUTE = 24;
+    const REMINDER_MINUTE = 30;
     const REMINDER_DURATION_MS = 2 * 60 * 1000; // 2 Minuten
 
     function isReminderActive(now) {
